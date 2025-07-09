@@ -2,5 +2,8 @@
 live_config_reload = true
 
 [window]
-opacity = 0.9
+decorations = "none"
+opacity = 0.95
+blur = true
 
+[keyboard]
