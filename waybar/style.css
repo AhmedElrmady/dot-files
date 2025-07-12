@@ -28,7 +28,7 @@
 
 window#waybar {
   border: 0px solid rgba(0, 0, 0, 0);
-  background-color: rgba(30, 30, 46, 0.9);
+  background-color: transparent;
 }
 
 #workspaces button {
