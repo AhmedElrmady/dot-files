@@ -52,12 +52,48 @@ set $menu albert toggle
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
 # Requires: desktop-backgrounds-compat, swaybg, jxl-pixbuf-loader
 output * bg /usr/share/backgrounds/default.jxl fill
+
 #
-# Example configuration:
+# Output configuration for eDP-1 (laptop) and HDMI-A-2 (external monitor)
+# Get output names with: swaymsg -t get_outputs
 #
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
-# You can get the names of your outputs by running: swaymsg -t get_outputs
+
+# Mirror mode - both displays show same content
+#output eDP-1 pos 0 0 mode 1920x1080@60Hz
+#output HDMI-A-2 pos 0 0 mode 1920x1080@60Hz
+
+# Extended mode - displays side by side (default)
+#output eDP-1 pos 0 0 mode 1920x1080@60Hz
+#output HDMI-A-2 pos 1920 0 mode 1920x1080@60Hz
+
+# High refresh rate for gaming (if supported)
+#output HDMI-A-2 pos 1920 0 mode 1920x1080@144Hz
+
+# Disable laptop screen when external monitor connected
+output eDP-1 disable
+output HDMI-A-2 pos 0 0 mode 1920x1080@120Hz
+
+# Scale settings for high DPI displays
+#output eDP-1 scale 1.5
+#output HDMI-A-2 scale 1.0
+
+# Power management
+#output HDMI-A-2 power on
+#output eDP-1 power off
+
+# Adaptive sync for gaming (if supported)
+#output HDMI-A-2 adaptive_sync on
+
+# Transform/rotation options
+#output HDMI-A-2 transform 90        # Rotate 90 degrees
+#output HDMI-A-2 transform flipped   # Flip horizontally
+
+# Quick toggle commands (use with swaymsg):
+# Mirror: swaymsg output HDMI-A-2 pos 0 0
+# Extend: swaymsg output HDMI-A-2 pos 1920 0
+# Toggle external: swaymsg output HDMI-A-2 toggle
+# Disable laptop: swaymsg output eDP-1 disable
+# Enable laptop: swaymsg output eDP-1 enable
 
 ### Idle configuration
 #
