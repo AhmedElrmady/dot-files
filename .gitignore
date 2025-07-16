@@ -1,0 +1,11 @@
+*
+!.bashrc
+!.vimrc
+!.profile
+!nvim/
+!ghostty/
+!alacritty/
+!sway/
+!waybar/
+!.tmux.conf
+
