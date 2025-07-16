@@ -159,10 +159,37 @@ source "$OSH"/oh-my-bash.sh
 alias rider='nohup /home/gray/Downloads/JetBrains\ Rider-2025.1.3/bin/rider.sh > /dev/null 2>&1 &'
 alias work='cd /run/media/gray/29250F36282409AC/Work/FI/Repos/'
 alias tor='/home/gray/Downloads/tor-browser/Browser/start-tor-browser --detach'
+alias fzf="fzf --preview 'bat --style=numbers --color=always {}'"
+alias cat='bat'
+alias tldr='help'
+alias cl='clear'
 function ls { command lsd "$@"; }
 function ll { command lsd -l "$@"; }
 function la { command lsd -la "$@"; }
 function lt { command lsd --tree "$@"; }
+function rg {
+  local results
+  results=$(command rg -i "$@" --line-number --no-heading --color=always)
+  if [[ -n "$results" ]]; then
+    echo "$results" | fzf --ansi --preview "bat --style=numbers --color=always {1}
+  --highlight-line {2}" --delimiter=":" | cut -d":" -f1 | xargs -n 1 nvim
+  else
+    echo "No matches found"
+  fi
+}
+function rgf {
+  read -p "Search for: " query
+  if [[ -n "$query" ]]; then
+    local results
+    results=$(command rg -i "$query" --line-number --no-heading --color=always 2>/dev/null)
+    if [[ -n "$results" ]]; then
+      echo "$results" | fzf --ansi --preview "bat --style=numbers --color=always {1}
+  --highlight-line {2}" --delimiter=":" | cut -d":" -f1 | xargs -n 1 nvim
+    else
+      echo "No matches found for: '$query'"
+    fi
+  fi
+}
 ##################### fzf ###########
 bind '"\C-d":"cd_with-fzf\n"'
 bind '"\C-D":"cd_with-fzf_from_PWD\n"'
