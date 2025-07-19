@@ -162,6 +162,7 @@ alias tor='/home/gray/Downloads/tor-browser/Browser/start-tor-browser --detach'
 alias fzf="fzf --preview 'bat --style=numbers --color=always {}'"
 alias cat='bat'
 alias cl='clear'
+alias lg='lazygit'
 function hlp { command tldr "$@"; }
 function yt { command yt-dlp "$@"; }
 function tm { command tmux "$@"; }
