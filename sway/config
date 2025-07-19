@@ -113,7 +113,7 @@ output HDMI-A-2 pos 0 0 mode 1920x1080@120Hz
 # Keyboard layout configuration
 input type:keyboard {
     xkb_layout us,ara
-    xkb_options grp:win_space_toggle
+    xkb_options grp:alt_shift_toggle
 }
 
 # Example configuration:
