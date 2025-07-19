@@ -161,8 +161,10 @@ alias work='cd /run/media/gray/29250F36282409AC/Work/FI/Repos/'
 alias tor='/home/gray/Downloads/tor-browser/Browser/start-tor-browser --detach'
 alias fzf="fzf --preview 'bat --style=numbers --color=always {}'"
 alias cat='bat'
-alias tldr='help'
 alias cl='clear'
+function hlp { command tldr "$@"; }
+function yt { command yt-dlp "$@"; }
+function tm { command tmux "$@"; }
 function ls { command lsd "$@"; }
 function ll { command lsd -l "$@"; }
 function la { command lsd -la "$@"; }
