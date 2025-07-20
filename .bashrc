@@ -164,6 +164,7 @@ alias cat='bat'
 alias cl='clear'
 alias lg='lazygit'
 alias sb='cd ~/Documents/Second-Brain/My-Virtual-Brain/ && nvim'
+alias conf='cd ~/.config/'
 function hlp { command tldr "$@"; }
 function yt { command yt-dlp "$@"; }
 function tm { command tmux "$@"; }
