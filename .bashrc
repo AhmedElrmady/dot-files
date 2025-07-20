@@ -163,6 +163,7 @@ alias fzf="fzf --preview 'bat --style=numbers --color=always {}'"
 alias cat='bat'
 alias cl='clear'
 alias lg='lazygit'
+alias sb='cd ~/Documents/Second-Brain/My-Virtual-Brain/ && nvim'
 function hlp { command tldr "$@"; }
 function yt { command yt-dlp "$@"; }
 function tm { command tmux "$@"; }
@@ -208,6 +209,7 @@ open_with_fzf() {
 }
 ####################################
 export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.config/scripts:$PATH"
 ####################################
 source ~/fzf-git.sh/fzf-git.sh
 ###################################

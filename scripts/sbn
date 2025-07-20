@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Error: Please provide a note name"
+    echo "Usage: sbn <note-name>"
+    exit 1
+fi
+
+NOTE_NAME="$1"
+VAULT_PATH="$HOME/Documents/Second-Brain/My-Virtual-Brain/00.Notes/01.Literature-Notes"
+NOTE_FILE="$VAULT_PATH/$NOTE_NAME.md"
+
+if [ ! -d "$VAULT_PATH" ]; then
+    echo "Error: Second brain vault directory not found at $VAULT_PATH"
+    exit 1
+fi
+
+if [ -f "$NOTE_FILE" ]; then
+    echo "Note '$NOTE_NAME' already exists. Opening..."
+else
+    echo "Creating new note: $NOTE_NAME"
+    touch "$NOTE_FILE"
+fi
+
+nvim "$NOTE_FILE"
