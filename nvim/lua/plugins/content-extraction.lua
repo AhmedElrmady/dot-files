@@ -142,11 +142,131 @@ return {
     vim.api.nvim_create_user_command("ProcessSyncs", process_syncs, { desc = "Process Raindrop sync files" })
     vim.api.nvim_create_user_command("ExtractHere", extract_here, { desc = "Extract URL from buffer" })
 
+    -- Preview content before extraction
+    local function preview_url()
+      local url = vim.fn.input("Enter URL to preview: ")
+      if url == "" then return end
+      
+      local cmd = string.format('cd "%s" && python3 content_preview.py "%s"', config.scripts_path, url)
+      
+      vim.fn.jobstart(cmd, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+          if data and #data > 0 then
+            local preview = table.concat(data, "\n")
+            vim.notify(preview, vim.log.levels.INFO)
+          end
+        end
+      })
+    end
+
+    -- Enhanced extraction with AI
+    local function extract_url_enhanced()
+      local url = vim.fn.input("Enter URL to extract (enhanced): ")
+      if url == "" then return end
+      
+      vim.notify("Extracting and enhancing content...")
+      
+      -- First extract basic content
+      local extract_cmd = string.format('cd "%s" && python3 extract_single_url.py "%s"', config.scripts_path, url)
+      
+      vim.fn.jobstart(extract_cmd, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+          if data and #data > 0 then
+            local content = table.concat(data, "\n")
+            
+            -- Get title
+            local title_cmd = string.format('cd "%s" && python3 extract_single_url.py "%s" --title-only', config.scripts_path, url)
+            vim.fn.jobstart(title_cmd, {
+              stdout_buffered = true,
+              on_stdout = function(_, title_data)
+                if title_data and #title_data > 0 then
+                  local title = table.concat(title_data, ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+                  
+                  -- Enhance with AI using stdin (no temp files)
+                  local enhance_cmd = string.format('cd "%s" && echo %s | python3 ai_content_enhancer.py --title "%s" --content-from-stdin --url "%s"', 
+                                                  config.scripts_path, vim.fn.shellescape(content), title:gsub('"', '\\"'), url)
+                    
+                    vim.fn.jobstart(enhance_cmd, {
+                      stdout_buffered = true,
+                      on_stdout = function(_, enhanced_data)
+                        if enhanced_data and #enhanced_data > 0 then
+                          local enhanced_content = table.concat(enhanced_data, "\n")
+                          
+                          -- Save enhanced file
+                          local sanitized_title = title:gsub("[^%w%s]", ""):gsub("%s+", " "):sub(1, 150)
+                          local filename = sanitized_title .. ".md"
+                          local filepath = config.unsorted_path .. "/" .. filename
+                          
+                          local output_file = io.open(filepath, "w")
+                          if output_file then
+                            output_file:write(enhanced_content)
+                            output_file:close()
+                            vim.cmd("edit " .. vim.fn.fnameescape(filepath))
+                            vim.notify("✨ Enhanced content saved: " .. filename)
+                          end
+                        end
+                      end
+                    })
+                    
+                    -- Clean up temp file after a delay
+                    vim.defer_fn(function()
+                      os.remove(temp_file)
+                    end, 1000)
+                  end
+                end
+              end
+            })
+          end
+        end
+      })
+    end
+
+    -- Batch URL processing
+    local function batch_extract()
+      local urls_input = vim.fn.input("Enter URLs (comma-separated): ")
+      if urls_input == "" then return end
+      
+      local urls = {}
+      for url in urls_input:gmatch("([^,]+)") do
+        table.insert(urls, vim.trim(url))
+      end
+      
+      vim.notify(string.format("Processing %d URLs...", #urls))
+      
+      for i, url in ipairs(urls) do
+        vim.defer_fn(function()
+          local cmd = string.format('cd "%s" && python3 extract_single_url.py "%s"', config.scripts_path, url)
+          vim.fn.jobstart(cmd, {
+            on_exit = function(_, code)
+              if code == 0 then
+                vim.notify(string.format("✓ Processed %d/%d: %s", i, #urls, url))
+              else
+                vim.notify(string.format("✗ Failed %d/%d: %s", i, #urls, url), vim.log.levels.ERROR)
+              end
+            end
+          })
+        end, (i - 1) * 2000) -- 2 second delay between requests
+      end
+    end
+
+    -- Commands
+    vim.api.nvim_create_user_command("ExtractURL", extract_url, { desc = "Extract URL to new file" })
+    vim.api.nvim_create_user_command("ExtractURLEnhanced", extract_url_enhanced, { desc = "Extract URL with AI enhancement" })
+    vim.api.nvim_create_user_command("PreviewURL", preview_url, { desc = "Preview URL content" })
+    vim.api.nvim_create_user_command("BatchExtract", batch_extract, { desc = "Batch extract multiple URLs" })
+    vim.api.nvim_create_user_command("ProcessSyncs", process_syncs, { desc = "Process Raindrop sync files" })
+    vim.api.nvim_create_user_command("ExtractHere", extract_here, { desc = "Extract URL from buffer" })
+
     -- Keymaps
     vim.keymap.set("n", "<leader>eu", extract_url, { desc = "Extract URL" })
+    vim.keymap.set("n", "<leader>eE", extract_url_enhanced, { desc = "Extract URL (Enhanced)" })
+    vim.keymap.set("n", "<leader>ep", preview_url, { desc = "Preview URL" })
+    vim.keymap.set("n", "<leader>eb", batch_extract, { desc = "Batch Extract" })
     vim.keymap.set("n", "<leader>es", process_syncs, { desc = "Process Syncs" })
     vim.keymap.set("n", "<leader>eh", extract_here, { desc = "Extract Here" })
 
-    vim.notify("Content extraction plugin loaded!")
+    vim.notify("🚀 Enhanced content extraction plugin loaded!")
   end,
 }
